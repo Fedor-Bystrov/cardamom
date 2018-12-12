@@ -9,8 +9,8 @@ public class App {
 
   public static void main(String[] args) {
     final var app = Javalin.create().start(7000);
+
     app.get("/webhooks/wunderlist", ctx -> LOGGER.info(
-        "Callback from wunderlist! body: ",
-        ctx, ctx.req, ctx.body()));
+        "Callback from wunderlist! body: ", ctx, ctx.req, ctx.body()));
   }
 }
