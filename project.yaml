@@ -1,0 +1,3 @@
+project: wunder-trello-syncer
+deps:
+    - com.sparkjava:spark-core@2.7.2
