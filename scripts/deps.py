@@ -1,28 +1,46 @@
 import subprocess
 import requests
 import yaml
+import re
+
+from xml.etree import ElementTree
 
 deps_path = '/Users/fbystrov/.tyr/deps'
-path = 'http://central.maven.org/maven2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar'
+
+# Maven
+# https://search.maven.org/classic/#api
+dep_pattern = re.compile(r'^([a-zA-Z]+\.[a-zA-Z]+):([\w\W]+)@(\d+\.\d+\.\d+)$')
+filepath_url = 'https://search.maven.org/remotecontent?filepath={}'
 
 
 def spawn_wget(url: str) -> int:
     result = subprocess.run(['wget', '-P', deps_path, url])
     return result.returncode
 
-# spawn_wget(path)
 
-# maven api guide:
-# https://search.maven.org/classic/#api
-def search_maven():
-    prefix = 'http://search.maven.org/#search|ga|1|guice'
-
-
-with open('project.yaml', 'r') as f:
-    deps = yaml.load(f)
-    print('project: ', deps['project'])
-    print('deps: ', deps['deps'])
-    
 def get_deps() -> list:
-    with open('project.yaml', 'r') as f:
+    with open('../project.yaml', 'r') as f:
         return yaml.load(f)['deps']
+
+
+def get_maven_pom(row: str) -> ElementTree:
+    r = requests.get(filepath_url.format(row))
+    return ElementTree.fromstring(r.text)
+
+
+def run():
+    for dep in get_deps():
+        res = dep_pattern.match(dep)
+        print('groupId:', res.group(1))
+        print('artefactId', res.group(2))
+        print('version:', res.group(3))
+
+        pom = get_maven_pom('{groupId}/{artefactId}/{version}/{artefactId}-{version}.pom'.format(
+            groupId=res.group(1).replace('.', '/'),
+            artefactId=res.group(2),
+            version=res.group(3)))
+        print(pom)
+
+
+if __name__ == '__main__':
+    run()
