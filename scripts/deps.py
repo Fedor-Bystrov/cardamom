@@ -32,12 +32,12 @@ def run():
     for dep in get_deps():
         res = dep_pattern.match(dep)
         print('groupId:', res.group(1))
-        print('artefactId', res.group(2))
+        print('artifact', res.group(2))
         print('version:', res.group(3))
 
-        pom = get_maven_pom('{groupId}/{artefactId}/{version}/{artefactId}-{version}.pom'.format(
+        pom = get_maven_pom('{groupId}/{artifact}/{version}/{artifact}-{version}.pom'.format(
             groupId=res.group(1).replace('.', '/'),
-            artefactId=res.group(2),
+            artifact=res.group(2),
             version=res.group(3)))
         print(pom)
 
