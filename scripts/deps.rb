@@ -1,10 +1,12 @@
 require 'yaml'
 
+$deps_path = '~/.tyr/deps'
+
 # Runs wget in a new subprocess
 # Params:
 # +url+:: URL of file
 def spawn_wget(url)
-  IO.popen("wget -P ~/.tyr/deps #{url}") { |f| puts f.gets}
+  IO.popen("wget -P #{$deps_path} #{url}") { |f| puts f.gets}
 end
 
 # Reads a project configuration file project.yaml
