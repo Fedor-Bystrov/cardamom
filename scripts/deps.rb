@@ -4,8 +4,9 @@ require 'faraday'
 require 'yaml'
 
 $deps_path = '~/.tyr/deps'
-$filepath_pattern = /^([a-zA-Z]+\.[a-zA-Z]+):([\w\W]+)@(\d+\.\d+\.\d+)$/
+$filepath_pattern = /^([a-zA-Z]+\.[a-zA-Z]+):([\w\W]+)@(v?\d+\.\d+\.\d+)$/
 $pom_filepath_prefix = 'https://search.maven.org/remotecontent?filepath='
+$pom_param_pattern = /^\$\{(.+)\}$/
 
 # Runs wget in a new subprocess and
 # downloads file to $deps_path
@@ -48,19 +49,40 @@ end
 
 # Parses maven pom file and returns properties as ruby hash
 def get_pom_properties(pom_doc)
-  return pom_doc.css('properties').map do |node|
-    node.children.map{ |child| { child.name => child.text} }
+  return pom_doc.css('properties').children.map {|c| [c.name, c.text]}.to_h
+end
+
+# TODO comment
+def reject_test_deps(dep_nodes)
+  return dep_nodes.reject {|d| d.css('scope').text == 'test'}
+end
+
+# TODO comment
+def resolve_version(text, props)
+  if match = $pom_param_pattern.match(text)
+    key, _ = match.captures
+    return props.fetch(key)
   end
 end
 
+# TODO comment
+def get_pom_dependecies(pom_doc)
+  props = get_pom_properties pom_doc
+  deps = reject_test_deps pom_doc.css('dependencies//dependency')
+  return deps.map do |dep|
+    groupId = dep.at('groupId').text
+    artifactId = dep.at('artifactId').text
+    version = resolve_version dep.at('version').text, props
 
-pom =  fetch_pom dep_to_filepath read_project_file['deps'][0]
-dependecies = pom.css('dependencies').map do |node|
-  node.children.map{ |child| { child.name => child.text} }
+    "#{groupId}:#{artifactId}@#{version}"
+  end
 end
-puts dependecies
 
-# puts get_pom_properties pom
+project_deps = read_project_file['deps'][0]
+pom = fetch_pom dep_to_filepath project_deps
+dependencies = get_pom_dependecies pom
+
+puts dependencies
 
 # fetch_pom 'com/sparkjava/spark-core/2.7.2/spark-core-2.7.2.pom'
 # spawn_wget('http://central.maven.org/maven2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar')
