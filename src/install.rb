@@ -1,31 +1,26 @@
 require 'yaml'
 require 'set'
+
 require_relative 'mvn'
+require_relative 'dep'
 
 module INSTALL
   @@deps_path = '~/.cardamom/deps'
+  @@dep_pattern = /^(.+):([^@]+)(?:@(.*)$|$)/
 
   def self.init
-    puts 'init!'
     project_yaml = YAML.load_file('../project.yaml')
     project_deps = project_yaml['deps'].map do |dep|
       dep
     end
+    # TODO парсить зависимости из project_yaml в объекты,
+    # подтягивать версии если не указаны
+    # Далее рекурсивно
 
     puts project_deps
   end
 end
 
-
-
-# pom = fetch_pom dep_to_filepath project_deps
-# pom_dep = get_pom_dependecies pom
-
-# puts project_dependencies
-
-# dependencies.each {|dep| puts $pom_filepath_prefix + dep}
-# fetch_pom 'com/sparkjava/spark-core/2.7.2/spark-core-2.7.2.pom'
-# spawn_wget('http://central.maven.org/maven2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar')
 
 # 1. Собираем все зависимости, резолвим версии если не указаны
 #    Зависимости из project.yml -> зависимости зависемостей из project.yml и т.д
