@@ -87,6 +87,12 @@ module MVN
       @scope = scope
       @optional = optional
     end
+
+    def filepath
+      groupId = @groupId.gsub('.', '/')
+      artifactId = @artifactId.gsub('.', '/')
+      return "#{groupId}/#{artifactId}/#{@version}/#{artifactId}-#{@version}.pom"
+    end
   end
 end
 
