@@ -1,6 +1,4 @@
 require 'bundler/setup'
-require 'nokogiri'
-require 'faraday'
 require 'yaml'
 require 'set'
 
@@ -25,15 +23,6 @@ def dep_to_filepath(dep_uri)
   groupId = group1.gsub('.', '/')
   artifactId = group2.gsub('.', '/')
   return "#{groupId}/#{artifactId}/#{version}/#{artifactId}-#{version}.pom"
-end
-
-
-# Rejects all dependencies with test scope
-# from dependency nodes list
-# Params:
-# +dep_nodes+:: list of dependency xml nodes
-def reject_test_deps(dep_nodes)
-  return dep_nodes.reject {|d| d.css('scope').text == 'test'}
 end
 
 def collect_deps(dep_uri)

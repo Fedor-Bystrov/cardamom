@@ -53,21 +53,21 @@ module MVN
         return pom_doc.css('dependencies//dependency').map do |dep|
           groupId = dep.at('groupId').text
           artifactId = dep.at('artifactId').text
-          version = resolve_property dep.at('version').text
-          # TODO парсить текст scope или класть nil
-          scope = dep.at('scope')
-          # TODO парсить текст optional или класть false
-          optional = dep.at('optional')
+          version_n = dep.at('version')
+          scope_n = dep.at('scope')
+          optional_n = dep.at('optional')
 
-          Dependency.new(groupId, artifactId, version, scope, optional)
+          Dependency.new(groupId, artifactId,
+                         version_n.nil?  ? nil   : resolve_prop(version_n.text),
+                         scope_n.nil?    ? nil   : scope_n.text,
+                         optional_n.nil? ? false : optional_n.text)
         end
       end
 
       # Substitutes given placeholder string for maven property.
       # Params:
       # +text+:: string with placeholder
-      # +props+:: hash with properties from pom
-      def resolve_property(text)
+      def resolve_prop(text)
         if text.include? '$' and match = @@param_pattern.match(text)
           key, _ = match.captures
           return @props.fetch(key)
