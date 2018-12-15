@@ -1,6 +1,7 @@
-require 'bundler/setup'
 require 'yaml'
 require 'set'
+
+require_relative 'mvn'
 
 $deps_path = '~/.cardamom/deps'
 

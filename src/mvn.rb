@@ -3,6 +3,8 @@ require 'nokogiri'
 require 'faraday'
 require 'json'
 
+require_relative 'dep'
+
 module MVN
   @@srch_conn = Faraday.new(:url => 'https://search.maven.org')
   @@remotecontent_uri = '/remotecontent?filepath=%s'
@@ -57,10 +59,10 @@ module MVN
           scope_n = dep.at('scope')
           optional_n = dep.at('optional')
 
-          Dependency.new(groupId, artifactId,
-                         version_n.nil?  ? nil   : resolve_prop(version_n.text),
-                         scope_n.nil?    ? nil   : scope_n.text,
-                         optional_n.nil? ? false : optional_n.text)
+          DEP::new(groupId, artifactId,
+                  version_n.nil?  ? nil   : resolve_prop(version_n.text),
+                  scope_n.nil?    ? nil   : scope_n.text,
+                  optional_n.nil? ? false : optional_n.text)
         end
       end
 
@@ -75,24 +77,6 @@ module MVN
 
         return text
       end
-  end
-
-  class Dependency
-    attr_reader :groupdId, :artifactId, :version, :scope, :optional
-
-    def initialize(groupId, artifactId, version, scope, optional)
-      @groupId = groupId
-      @artifactId = artifactId
-      @version = version
-      @scope = scope
-      @optional = optional
-    end
-
-    def filepath
-      groupId = @groupId.gsub('.', '/')
-      artifactId = @artifactId.gsub('.', '/')
-      return "#{groupId}/#{artifactId}/#{@version}/#{artifactId}-#{@version}.pom"
-    end
   end
 end
 
