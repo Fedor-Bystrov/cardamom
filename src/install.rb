@@ -1,43 +1,23 @@
 require 'yaml'
 require 'set'
-
 require_relative 'mvn'
 
-$deps_path = '~/.cardamom/deps'
+module INSTALL
+  @@deps_path = '~/.cardamom/deps'
 
-# Reads a project configuration file project.yaml
-# located at the root of project folder
-# Returns hash with project config
-def read_project_file
-  return YAML.load_file('project.yaml')
-end
+  def self.init
+    puts 'init!'
+    project_yaml = YAML.load_file('../project.yaml')
+    project_deps = project_yaml['deps'].map do |dep|
+      dep
+    end
 
-# Converts package.yml dep string to filepath for maven repository
-# Returns maven filepath string
-# +dep_uri+:: dependency uri from project.yaml dep entry
-def dep_to_filepath(dep_uri)
-  unless match = $filepath_pattern.match(dep_uri)
-    raise "invalid dep uri: #{dep_uri}"
+    puts project_deps
   end
-
-  group1, group2, version = match.captures
-  groupId = group1.gsub('.', '/')
-  artifactId = group2.gsub('.', '/')
-  return "#{groupId}/#{artifactId}/#{version}/#{artifactId}-#{version}.pom"
 end
 
-def collect_deps(dep_uri)
-  puts dep_uri
-  # puts dep_to_filepath dep_uri
-end
 
-# 1. Резолвим все зависимости указанные в project.yml
-project_deps = read_project_file['deps'].map do |dep|
-  puts dep
-  dep
-end
 
-puts project_deps
 # pom = fetch_pom dep_to_filepath project_deps
 # pom_dep = get_pom_dependecies pom
 
