@@ -2,6 +2,7 @@ require 'bundler/setup'
 require 'nokogiri'
 require 'faraday'
 require 'yaml'
+require 'set'
 
 $deps_path = '~/.tyr/deps'
 $filepath_pattern = /^(.+):(.+)@(.+)$/
@@ -28,7 +29,7 @@ end
 # Params:
 # +dep_uri+:: dependency uri from project.yaml dep entry
 def fetch_pom(dep_uri)
-# TODO заюзать faraday connection object 
+# TODO заюзать faraday connection object
 # см. https://github.com/lostisland/faraday
   res = Faraday.get $pom_filepath_prefix + dep_uri
   return Nokogiri::XML(res.body) do |config|
@@ -76,7 +77,9 @@ def resolve_pom_property(text, props)
   return text
 end
 
-# Parses pom node and returns list of dependencies 
+# Parses pom node and returns list of dependencies
+# Params:
+# +pom_doc+:: mvn pom root node
 def get_pom_dependecies(pom_doc)
   props = get_pom_properties pom_doc
   deps = reject_test_deps pom_doc.css('dependencies//dependency')
@@ -86,15 +89,26 @@ def get_pom_dependecies(pom_doc)
     artifactId = dep.at('artifactId').text
     version = resolve_pom_property dep.at('version').text, props
 
-    dep_to_filepath "#{groupId}:#{artifactId}@#{version}"
+    "#{groupId}:#{artifactId}@#{version}"
   end
 end
 
-project_deps = read_project_file['deps'][0]
-pom = fetch_pom dep_to_filepath project_deps
-dependencies = get_pom_dependecies pom
+def collect_deps(dep_uri)
+  puts dep_uri
+  # puts dep_to_filepath dep_uri
+end
 
-puts dependencies
+project_dependencies = read_project_file['deps'].to_set
 
+project_dependencies.each { |dep_uri|
+ collect_deps dep_uri
+}
+
+# pom = fetch_pom dep_to_filepath project_deps
+# pom_dep = get_pom_dependecies pom
+
+# puts project_dependencies
+
+# dependencies.each {|dep| puts $pom_filepath_prefix + dep}
 # fetch_pom 'com/sparkjava/spark-core/2.7.2/spark-core-2.7.2.pom'
 # spawn_wget('http://central.maven.org/maven2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar')
