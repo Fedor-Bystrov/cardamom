@@ -11,8 +11,19 @@ module INSTALL
   def self.init
     project_yaml = YAML.load_file('../project.yaml')
     project_deps = project_yaml['deps'].map do |dep|
-      dep
+      unless match = @@dep_pattern.match(dep)
+        raise 'Cannot match project dep %s' % dep
+      end
+
+      groupId, artifactId, version = match.captures
+
+      if version.nil?
+        version = MVN::find_latest_version(groupId, artifactId)
+      end
+
+      DEP::new(groupId, artifactId, version)
     end
+
     # TODO парсить зависимости из project_yaml в объекты,
     # подтягивать версии если не указаны
     # Далее рекурсивно
