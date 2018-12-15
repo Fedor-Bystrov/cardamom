@@ -4,7 +4,7 @@ require 'faraday'
 require 'yaml'
 
 $deps_path = '~/.tyr/deps'
-$filepath_pattern = /^([a-zA-Z]+\.[a-zA-Z]+):([\w\W]+)@(v?\d+\.\d+\.\d+)$/
+$filepath_pattern = /^(.+):(.+)@(.+)$/
 $pom_filepath_prefix = 'https://search.maven.org/remotecontent?filepath='
 $pom_param_pattern = /^\$\{(.+)\}$/
 
@@ -23,7 +23,7 @@ def read_project_file
   return YAML.load_file('project.yaml')
 end
 
-# Fetches pom.xml from maven repository for given dep_ur
+# Fetches pom.xml from maven repository for given dep_uri
 # Returns pom xml object
 # Params:
 # +dep_uri+:: dependency uri from project.yaml dep entry
@@ -59,10 +59,12 @@ end
 
 # TODO comment
 def resolve_version(text, props)
-  if match = $pom_param_pattern.match(text)
+  if text.include? '$' and match = $pom_param_pattern.match(text)
     key, _ = match.captures
     return props.fetch(key)
   end
+
+  return text
 end
 
 # TODO comment
@@ -74,7 +76,7 @@ def get_pom_dependecies(pom_doc)
     artifactId = dep.at('artifactId').text
     version = resolve_version dep.at('version').text, props
 
-    "#{groupId}:#{artifactId}@#{version}"
+    dep_to_filepath "#{groupId}:#{artifactId}@#{version}"
   end
 end
 
@@ -82,7 +84,7 @@ project_deps = read_project_file['deps'][0]
 pom = fetch_pom dep_to_filepath project_deps
 dependencies = get_pom_dependecies pom
 
-puts dependencies
+puts dependencies # TODO `кривой регексп
 
 # fetch_pom 'com/sparkjava/spark-core/2.7.2/spark-core-2.7.2.pom'
 # spawn_wget('http://central.maven.org/maven2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar')
