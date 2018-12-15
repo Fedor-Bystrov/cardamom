@@ -13,7 +13,7 @@ $pom_param_pattern = /^\$\{(.+)\}$/
 # Params:
 # +url+:: URL of file
 def spawn_wget(url)
-  IO.popen("wget -P #{$deps_path} #{url}") { |r| puts r.gets}
+  IO.popen("wget -P #{$deps_path} #{url}") {|r| puts r.gets}
 end
 
 # Reads a project configuration file project.yaml
@@ -28,7 +28,8 @@ end
 # Params:
 # +dep_uri+:: dependency uri from project.yaml dep entry
 def fetch_pom(dep_uri)
-# TODO заюзать faraday connection object см. https://github.com/lostisland/faraday
+# TODO заюзать faraday connection object 
+# см. https://github.com/lostisland/faraday
   res = Faraday.get $pom_filepath_prefix + dep_uri
   return Nokogiri::XML(res.body) do |config|
     config.noblanks
@@ -40,11 +41,13 @@ end
 # +dep_uri+:: dependency uri from project.yaml dep entry
 def dep_to_filepath(dep_uri)
   unless match = $filepath_pattern.match(dep_uri)
-    raise "invalid dep_uri: #{dep_uri}"
+    raise "invalid dep uri: #{dep_uri}"
   end
 
-  groupId, artifact, version = match.captures
-  return "#{groupId.sub('.', '/')}/#{artifact}/#{version}/#{artifact}-#{version}.pom"
+  group1, group2, version = match.captures
+  groupId = group1.gsub('.', '/')
+  artifactId = group2.gsub('.', '/')
+  return "#{groupId}/#{artifactId}/#{version}/#{artifactId}-#{version}.pom"
 end
 
 # Parses maven pom file and returns properties as ruby hash
@@ -52,13 +55,19 @@ def get_pom_properties(pom_doc)
   return pom_doc.css('properties').children.map {|c| [c.name, c.text]}.to_h
 end
 
-# TODO comment
+# Rejects all dependencies with test scope
+# from dependecy nodes list
+# Params:
+# +dep_nodes+:: list of dependency xml nodes
 def reject_test_deps(dep_nodes)
   return dep_nodes.reject {|d| d.css('scope').text == 'test'}
 end
 
-# TODO comment
-def resolve_version(text, props)
+# Substitutes given placeholder string for maven property.
+# Params:
+# +text+:: string with placeholder
+# +props+:: hash with properties from pom
+def resolve_pom_property(text, props)
   if text.include? '$' and match = $pom_param_pattern.match(text)
     key, _ = match.captures
     return props.fetch(key)
@@ -67,14 +76,15 @@ def resolve_version(text, props)
   return text
 end
 
-# TODO comment
+# Parses pom node and returns list of dependencies 
 def get_pom_dependecies(pom_doc)
   props = get_pom_properties pom_doc
   deps = reject_test_deps pom_doc.css('dependencies//dependency')
+
   return deps.map do |dep|
     groupId = dep.at('groupId').text
     artifactId = dep.at('artifactId').text
-    version = resolve_version dep.at('version').text, props
+    version = resolve_pom_property dep.at('version').text, props
 
     dep_to_filepath "#{groupId}:#{artifactId}@#{version}"
   end
@@ -84,7 +94,7 @@ project_deps = read_project_file['deps'][0]
 pom = fetch_pom dep_to_filepath project_deps
 dependencies = get_pom_dependecies pom
 
-puts dependencies # TODO `кривой регексп
+puts dependencies
 
 # fetch_pom 'com/sparkjava/spark-core/2.7.2/spark-core-2.7.2.pom'
 # spawn_wget('http://central.maven.org/maven2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar')
