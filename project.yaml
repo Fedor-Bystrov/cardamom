@@ -1,5 +1,5 @@
 project: wunder-trello-syncer
 deps:
     - com.sparkjava:spark-core@2.7.2
-    - org.eclipse.jetty:jetty-server@9.4.8.v20171121
+    # - org.eclipse.jetty:jetty-server@9.4.8.v20171121
     - javax.servlet:javax.servlet-api

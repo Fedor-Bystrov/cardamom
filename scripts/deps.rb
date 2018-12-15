@@ -6,8 +6,9 @@ require 'set'
 
 $deps_path = '~/.tyr/deps'
 $filepath_pattern = /^(.+):(.+)@(.+)$/
-$pom_filepath_prefix = 'https://search.maven.org/remotecontent?filepath='
+$pom_filepath_prefix = 'https://search.maven.org/remotecontent?filepath=%s'
 $pom_param_pattern = /^\$\{(.+)\}$/
+$mvn_search_url = 'https://search.maven.org/solrsearch/select?q=g:"%s" AND a:"%s"&rows=1&wt=json'
 
 # Runs wget in a new subprocess and
 # downloads file to $deps_path
@@ -57,7 +58,7 @@ def get_pom_properties(pom_doc)
 end
 
 # Rejects all dependencies with test scope
-# from dependecy nodes list
+# from dependency nodes list
 # Params:
 # +dep_nodes+:: list of dependency xml nodes
 def reject_test_deps(dep_nodes)
@@ -93,17 +94,27 @@ def get_pom_dependecies(pom_doc)
   end
 end
 
+def find_lates(dep_uri)
+end
+
 def collect_deps(dep_uri)
   puts dep_uri
   # puts dep_to_filepath dep_uri
 end
 
-project_dependencies = read_project_file['deps'].to_set
 
-project_dependencies.each { |dep_uri|
- collect_deps dep_uri
-}
+# 1. Резолвим все зависимости указанные в project.yml
+project_deps = read_project_file['deps'].map do |dep|
+  puts dep
+  dep
+end
 
+
+
+
+
+
+puts project_deps
 # pom = fetch_pom dep_to_filepath project_deps
 # pom_dep = get_pom_dependecies pom
 
