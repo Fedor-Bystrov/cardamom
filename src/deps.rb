@@ -10,12 +10,9 @@ $pom_filepath_prefix = 'https://search.maven.org/remotecontent?filepath=%s'
 $pom_param_pattern = /^\$\{(.+)\}$/
 $mvn_search_url = 'https://search.maven.org/solrsearch/select?q=g:"%s" AND a:"%s"&rows=1&wt=json'
 
-# Runs wget in a new subprocess and
-# downloads file to $deps_path
-# Params:
-# +url+:: URL of file
+
 def spawn_wget(url)
-  IO.popen("wget -P #{$deps_path} #{url}") {|r| puts r.gets}
+
 end
 
 # Reads a project configuration file project.yaml
