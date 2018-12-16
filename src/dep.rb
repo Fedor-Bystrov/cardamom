@@ -23,7 +23,7 @@ module DEP
     end
 
     def to_s
-      return "Dependency(#{@groupId}:#{@artifactId}@#{@version})"
+      return "#{@groupId}:#{@artifactId}@#{@version}"
     end
   end
 end

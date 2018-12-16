@@ -45,7 +45,7 @@ module MVN
     end
 
     def to_s
-      return "POM(#{@groupId}, #{@artifactId}, #{@version}, #{@props}, #{@deps.map{|dep| dep.to_s}}"
+      return "POM{#{@groupId}, #{@artifactId}, #{@version}, #{@props}, #{@deps.map{|dep| dep.to_s}}}"
     end
 
     private
