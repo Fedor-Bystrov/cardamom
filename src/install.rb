@@ -9,7 +9,12 @@ module INSTALL
   @@dep_pattern = /^(.+):([^@]+)(?:@(.*)$|$)/
 
   def self.init
+    puts 'Starting project initialization process'
+
+    puts 'Reading project.yaml'
     project_yaml = YAML.load_file('project.yaml')
+
+    puts 'Resolving project dependencies'
     project_deps = project_yaml['deps'].map do |dep|
       unless match = @@dep_pattern.match(dep)
         raise 'Cannot match project dep %s' % dep
@@ -18,13 +23,16 @@ module INSTALL
       groupId, artifactId, version = match.captures
 
       if version.nil?
+        puts "Finding latest version for #{groupId}:#{artifactId}"
         version = MVN::find_latest_version(groupId, artifactId)
       end
 
       DEP::new(groupId, artifactId, version)
     end
 
+    puts 'Fetching poms for dependencies'
     project_poms = project_deps.map do |dep|
+      puts "fetching pom for #{dep}"
       MVN::fetch_pom dep
     end
 
@@ -42,3 +50,8 @@ INSTALL::init
 # 3. Сохраняем результать в project.lock (например как в Pipfile.lock, посмотреть на yarn.lock)
 # 4. Не плохо бы проверять хэши
 # 5. Нужно ли хранить список модулей их имена и то чтот они экспортят, реквайрят?
+
+#
+# File.open("coffee.yml", "w") { |file| file.write(recipe.to_yaml) }
+# File.write('/tmp/test.yml', d.to_yaml)
+# YAML.dump(project_poms)

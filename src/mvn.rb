@@ -37,22 +37,21 @@ module MVN
 
     def initialize(dep, pom_xml)
       pom_doc = Nokogiri::XML(pom_xml) {|config| config.noblanks}
-      @props = parse_props pom_doc
-      @deps = parse_deps pom_doc
       @groupId = dep.groupId
       @artifactId = dep.artifactId
       @version = dep.version
+      @props = parse_props pom_doc
+      @deps = parse_deps pom_doc
     end
 
     def to_s
       return "POM{#{@groupId}, #{@artifactId}, #{@version}, #{@props}, #{@deps.map{|dep| dep.to_s}}}"
     end
 
-    private
+
       # Parses maven pom root node and returns properties as ruby hash
       def parse_props(pom_doc)
-        props = pom_doc.css('properties').children.map {|c| [c.name, c.text]}.to_h
-        return props
+        return pom_doc.css('properties').children.map {|c| [c.name, c.text]}.to_h
       end
 
       # Parses pom node and returns list of all dependencies
@@ -68,9 +67,10 @@ module MVN
           optional_n = dep.at('optional')
 
           DEP::new(groupId, artifactId,
-                  version_n.nil?  ? nil   : resolve_prop(version_n.text),
-                  scope_n.nil?    ? nil   : scope_n.text,
-                  optional_n.nil? ? false : optional_n.text)
+                  version_n.nil?  ? @version : resolve_prop(version_n.text),
+                  scope_n.nil?    ? nil      : scope_n.text,
+                  optional_n.nil? ? false    : optional_n.text)
+
         end
       end
 
@@ -78,7 +78,7 @@ module MVN
       # Params:
       # +text+:: string with placeholder
       def resolve_prop(text)
-        if text.include? '${project.version}'
+        if text == '${project.version}'
           return @version
         elsif text.include? '$' and match = @@param_pattern.match(text)
           key, _ = match.captures
