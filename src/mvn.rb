@@ -16,7 +16,7 @@ module MVN
   # +dep+:: dependency object
   def self.fetch_pom(dep)
     res = @@srch_conn.get @@remotecontent_uri % dep.filepath
-    return POM.new res.body, dep.version
+    return POM.new dep, res.body
   end
 
   # Finds latest version for dependency with provided
@@ -33,13 +33,19 @@ module MVN
   class POM
     @@param_pattern = /^\$\{(.+)\}$/
 
-    attr_reader :props, :deps
+    attr_reader :props, :deps, :version
 
-    def initialize(pom_xml, version)
+    def initialize(dep, pom_xml)
       pom_doc = Nokogiri::XML(pom_xml) {|config| config.noblanks}
       @props = parse_props pom_doc
       @deps = parse_deps pom_doc
-      @version = version
+      @groupId = dep.groupId
+      @artifactId = dep.artifactId
+      @version = dep.version
+    end
+
+    def to_s
+      return "POM(#{@groupId}, #{@artifactId}, #{@version}, #{@props}, #{@deps.map{|dep| dep.to_s}}"
     end
 
     private

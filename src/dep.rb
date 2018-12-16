@@ -5,7 +5,7 @@ module DEP
   end
 
   class Dependency
-    attr_reader :groupdId, :artifactId, :version, :scope, :optional
+    attr_reader :groupId, :artifactId, :version, :scope, :optional
 
     def initialize(groupId, artifactId, version, scope, optional)
       @groupId = groupId
@@ -20,6 +20,10 @@ module DEP
       groupId = @groupId.gsub('.', '/')
       artifactId = @artifactId.gsub('.', '/')
       return "#{groupId}/#{artifactId}/#{@version}/#{artifactId}-#{@version}.pom"
+    end
+
+    def to_s
+      return "Dependency(#{@groupId}:#{@artifactId}@#{@version})"
     end
   end
 end
