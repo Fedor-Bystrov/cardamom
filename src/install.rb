@@ -9,7 +9,7 @@ module INSTALL
   @@dep_pattern = /^(.+):([^@]+)(?:@(.*)$|$)/
 
   def self.init
-    project_yaml = YAML.load_file('../project.yaml')
+    project_yaml = YAML.load_file('project.yaml')
     project_deps = project_yaml['deps'].map do |dep|
       unless match = @@dep_pattern.match(dep)
         raise 'Cannot match project dep %s' % dep
@@ -24,13 +24,15 @@ module INSTALL
       DEP::new(groupId, artifactId, version)
     end
 
-    # TODO парсить зависимости из project_yaml в объекты,
-    # подтягивать версии если не указаны
-    # Далее рекурсивно
+    project_poms = project_deps.map do |dep|
+      MVN::fetch_pom dep
+    end
 
-    puts project_deps
+    puts project_poms
   end
 end
+
+INSTALL::init
 
 
 # 1. Собираем все зависимости, резолвим версии если не указаны
