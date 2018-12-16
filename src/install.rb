@@ -87,3 +87,6 @@ INSTALL::init
 # File.write('/tmp/test.yml', d.to_yaml)
 # YAML.dump(project_poms)
 # можно ли заюзать https://search.maven.org/artifact/org.powermock/powermock-api-mockito/1.6.6/jar ??
+# TODO slf4j-api-9.4.8.v20171121.jar  и javax/servlet-api-9.4.8.v20171121.jar
+# TODO не находится на http://central.maven.org/maven2/
+# TODO Принтить ошибки вгета м/б выделять красным
