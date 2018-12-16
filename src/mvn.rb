@@ -7,7 +7,7 @@ require_relative 'dep'
 
 module MVN
   @@srch_conn = Faraday.new(:url => 'https://search.maven.org')
-  @@remotecontent_uri = '/remotecontent?filepath=%s'
+  @@remotecontent_uri = '/remotecontent?filepath=%s.pom'
   @@select_uri = '/solrsearch/select?q=g:"%s"+AND+a:"%s"&rows=1&wt=json'
 
   # Fetches pom.xml from maven repository for given dependency

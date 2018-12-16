@@ -19,22 +19,19 @@ module DEP
     def filepath
       groupId = @groupId.gsub('.', '/')
       artifactId = @artifactId.gsub('.', '/')
-      return "#{groupId}/#{artifactId}/#{@version}/#{artifactId}-#{@version}.pom"
+      return "#{groupId}/#{artifactId}/#{@version}/#{artifactId}-#{@version}"
     end
 
     def eql?(other)
       @groupId == other.groupId and
       @artifactId == other.artifactId and
-      @version == other.version and
-      @scope == other.scope and
-      @optional == other.optional
+      @version == other.version
     end
 
     alias :== :eql?
 
     def hash
-      @groupId.hash + @artifactId.hash +
-      @version.hash + @scope.hash + @optional.hash
+      @groupId.hash + @artifactId.hash + @version.hash
     end
 
     def to_s
