@@ -22,6 +22,21 @@ module DEP
       return "#{groupId}/#{artifactId}/#{@version}/#{artifactId}-#{@version}.pom"
     end
 
+    def eql?(other)
+      @groupId == other.groupId and
+      @artifactId == other.artifactId and
+      @version == other.version and
+      @scope == other.scope and
+      @optional == other.optional
+    end
+
+    alias :== :eql?
+
+    def hash
+      @groupId.hash + @artifactId.hash +
+      @version.hash + @scope.hash + @optional.hash
+    end
+
     def to_s
       return "#{@groupId}:#{@artifactId}@#{@version}"
     end
