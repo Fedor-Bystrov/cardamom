@@ -1,0 +1,8 @@
+
+# Build
+javac -p ~/.cardamom/deps -d build/mod/org.cardamom \
+    org.cardamom/module-info.java \
+    org.cardamom/org/cardamom/Main.java
+
+# Run
+java -p ~/.cardamom/deps:build/mod/ -m org.cardamom/org.cardamom.Main
