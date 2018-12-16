@@ -7,7 +7,7 @@ require_relative 'dep'
 module INSTALL
   @@deps_path = '~/.cardamom/deps'
   @@dep_pattern = /^(.+):([^@]+)(?:@(.*)$|$)/
-  @@dependency_set = Set.new
+  @@deps = Set.new
 
   def self.init
     puts 'Starting project initialization process'
@@ -36,8 +36,8 @@ module INSTALL
     puts '================================================'
     puts 'Fetching poms for dependencies'
     puts '================================================'
-    project_poms = project_deps.map do |dep|
-      @@dependency_set.add dep
+    project_poms = project_deps.reject {|dep| @@deps.include? dep}.map do |dep|
+      @@deps.add dep
       puts "Fetching pom for #{dep}"
       MVN::fetch_pom dep
     end
@@ -46,20 +46,17 @@ module INSTALL
       recuriseve_fetch_deps pom
     end
 
-    puts "Dependencies: #{@@dependency_set.to_set.length}"
+    puts "Dependencies: #{@@deps.to_set.length}"
   end
 
   def self.recuriseve_fetch_deps(pom)
     if pom.deps.length == 0
-      puts "Zero dependencies reached for #{pom}"
       return
     end
 
-    pom.deps.map do |dep|
-      if dep.scope != 'test'
-        @@dependency_set.add dep
-        recuriseve_fetch_deps MVN::fetch_pom dep
-      end
+    pom.deps.reject {|dep| @@deps.include? dep}.map do |dep|
+      @@deps.add dep
+      recuriseve_fetch_deps MVN::fetch_pom dep
     end
   end
 end
@@ -80,5 +77,3 @@ INSTALL::init
 # File.write('/tmp/test.yml', d.to_yaml)
 # YAML.dump(project_poms)
 # можно ли заюзать https://search.maven.org/artifact/org.powermock/powermock-api-mockito/1.6.6/jar ??
-
-# TODO Нужно чекать если такая зависимости в сете, если есть то не ходить за помником
