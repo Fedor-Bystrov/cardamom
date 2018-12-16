@@ -3,6 +3,7 @@ require 'set'
 
 require_relative 'mvn'
 require_relative 'dep'
+require_relative 'wget'
 
 module INSTALL
   @@deps_path = '~/.cardamom/deps'
@@ -47,6 +48,15 @@ module INSTALL
     end
 
     puts "Dependencies: #{@@deps.to_set.length}"
+
+    puts '================================================'
+    puts 'Downloading jars'
+    puts '================================================'
+    @@deps.each do |dep|
+      # TODO refactor
+      WGET::run('~/.cardamom/deps', "http://central.maven.org/maven2/#{dep.filepath}.jar")
+    end
+
   end
 
   def self.recuriseve_fetch_deps(pom)
