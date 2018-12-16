@@ -59,7 +59,12 @@ module MVN
       # Params:
       # +pom_doc+:: mvn pom root node
       def parse_deps(pom_doc)
-        return pom_doc.css('dependencies//dependency').map do |dep|
+        # ignoring test deps for now
+        deps = pom_doc.css('dependencies//dependency').select { |dep|
+           dep.at('scope').nil? or dep.at('scope').text != 'test'
+        }
+
+        return deps.collect do |dep|
           groupId = dep.at('groupId').text
           artifactId = dep.at('artifactId').text
           version_n = dep.at('version')
@@ -70,7 +75,6 @@ module MVN
                   version_n.nil?  ? @version : resolve_prop(version_n.text),
                   scope_n.nil?    ? nil      : scope_n.text,
                   optional_n.nil? ? false    : optional_n.text)
-
         end
       end
 
