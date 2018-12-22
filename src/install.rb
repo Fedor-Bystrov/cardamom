@@ -66,7 +66,9 @@ module INSTALL
 
     pom.deps.reject {|dep| @@deps.include? dep}.map do |dep|
       @@deps.add dep
-      recuriseve_fetch_deps MVN::fetch_pom dep
+      pom_ = MVN::fetch_pom dep
+      # puts pom_
+      recuriseve_fetch_deps pom_
     end
   end
 end

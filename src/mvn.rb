@@ -24,6 +24,8 @@ module MVN
   # Params:
   # +groupId+:: dependency groupId
   # +artifactId+:: dependency artifactId
+  # TODO finds garbage, rethink this in java implementation
+  # TODO take a look on how maven itself looks for deps
   def self.find_latest_version(groupId, artifactId)
     res = @@srch_conn.get @@select_uri % [groupId, artifactId]
     res_json = JSON::parse(res.body).fetch('response')
@@ -71,10 +73,16 @@ module MVN
           scope_n = dep.at('scope')
           optional_n = dep.at('optional')
 
-          DEP::new(groupId, artifactId,
-                  version_n.nil?  ? @version : resolve_prop(version_n.text),
-                  scope_n.nil?    ? nil      : scope_n.text,
-                  optional_n.nil? ? false    : optional_n.text)
+          if version_n.nil?
+            puts "Finding latest version for #{groupId}:#{artifactId}"
+            version = MVN::find_latest_version(groupId, artifactId)
+          else
+            version = resolve_prop(version_n.text)
+          end
+
+          DEP::new(groupId, artifactId, version,
+                  scope_n.nil?    ? nil   : scope_n.text,
+                  optional_n.nil? ? false : optional_n.text)
         end
       end
 
