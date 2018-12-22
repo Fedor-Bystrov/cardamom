@@ -1,0 +1,6 @@
+#!/bin/bash
+
+FILES_PATH1=~/Downloads/jar_files
+
+echo "Starting app at http://localhost:4567/hello"
+java -p $FILES_PATH1:java/build/mod/ -m org.cardamom/org.cardamom.Main

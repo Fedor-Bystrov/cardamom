@@ -1,0 +1,9 @@
+#!/bin/bash
+
+FILES_PATH1=~/Downloads/jar_files
+
+javac -p $FILES_PATH1 -d java/build/mod/org.cardamom \
+    java/org.cardamom/module-info.java \
+    java/org.cardamom/org/cardamom/Main.java
+
+echo "OK"

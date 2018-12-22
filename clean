@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm -rf ./java/build
+echo "OK"
