@@ -53,8 +53,8 @@ module INSTALL
     puts 'Downloading jars'
     puts '================================================'
     @@deps.each do |dep|
-      # TODO refactor
-      WGET::run('~/.cardamom/deps', "http://central.maven.org/maven2/#{dep.filepath}.jar")
+      # TODO refactor and fix bug with sl4fj dependency for jetty
+      WGET::run("~/.cardamom/deps/#{dep.artifactId}-#{dep.version}.jar", "https://search.maven.org/remotecontent?filepath=#{dep.filepath}.jar")
     end
 
   end

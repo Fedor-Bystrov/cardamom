@@ -5,7 +5,7 @@ module WGET
     # +url+:: URL of file
     # +path+:: path for new file
     def self.run(path, url)
-        IO.popen("wget -P #{path} #{url}") {|r| puts r.gets}
+        IO.popen("wget -O #{path} #{url}") {|r| puts r.gets}
     end
 end
 
