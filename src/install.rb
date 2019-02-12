@@ -74,21 +74,3 @@ module INSTALL
 end
 
 INSTALL::init
-
-
-# 1. Собираем все зависимости, резолвим версии если не указаны
-#    Зависимости из project.yml -> зависимости зависемостей из project.yml и т.д
-#    В итоге должно получится (дерево или сет?) зависимостей
-# 2. Скачиваем зависимости
-# 3. Сохраняем результать в project.lock (например как в Pipfile.lock, посмотреть на yarn.lock)
-# 4. Не плохо бы проверять хэши
-# 5. Нужно ли хранить список модулей их имена и то чтот они экспортят, реквайрят?
-# 6. Переехать на формат com.sparkjava:spark-core:2.7.2
-#
-# File.open("coffee.yml", "w") { |file| file.write(recipe.to_yaml) }
-# File.write('/tmp/test.yml', d.to_yaml)
-# YAML.dump(project_poms)
-# можно ли заюзать https://search.maven.org/artifact/org.powermock/powermock-api-mockito/1.6.6/jar ??
-# TODO slf4j-api-9.4.8.v20171121.jar  и javax/servlet-api-9.4.8.v20171121.jar
-# TODO не находится на http://central.maven.org/maven2/
-# TODO Принтить ошибки вгета м/б выделять красным
